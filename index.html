@@ -1,0 +1,24 @@
+<!DOCTYPE HTML>
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+     License, v. 2.0. If a copy of the MPL was not distributed with this file,
+     You can obtain one at http://mozilla.org/MPL/2.0/. -->
+<html lang="en">
+<head>
+<title>SVG OpenType Workshop</title>
+<script src="SfntTables.js"></script>
+<script src="SvgTable.js"></script>
+<script src="CmapTable.js"></script>
+<script src="main.js"></script>
+<link rel="stylesheet" href="main.css">
+<style id="inlineStyle"></style>
+</head>
+<body>
+<p>Load file: <input id="inputFile" type="file">
+<p>SVG document: <button id="createTemplateButton">Create template</button>
+  <textarea spellcheck="false" id="svgText" class="editable"></textarea>
+<p id="svgTextError">
+<p>Sample text:
+  <div id="sample" class="editable" contenteditable></div>
+<p><a id="download" download="generated.otf">Save generated font</a>
+</body>
+</html>

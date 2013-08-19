@@ -1,0 +1,30 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+#sample {
+  font-family:SampleFont;
+  font-size:50px;
+  padding:20px;
+  height:200px;
+}
+.editable {     
+  white-space:pre;
+  margin:20px;
+  border:2px solid black;
+  display:block;
+}
+#svgText {
+  font-family:monospace;
+  height:200px;
+  overflow:auto;
+  width:80%;
+}
+#svgTextError {
+  display:none;
+}
+#svgTextError.error {
+  display:block;
+  color:red;
+}
+
