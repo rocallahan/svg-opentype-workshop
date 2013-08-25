@@ -85,7 +85,7 @@ SvgTable.fromDocuments = function (documents) {
     var elementsWithGlyphIds = doc.querySelectorAll("[id]");
     var glyphIds = [];
     for (var j = 0; j < elementsWithGlyphIds.length; ++j) {
-      var m = /^glyph([0-9]+)$/.exec(elementsWithGlyphIds[j].getAttribute("id"));
+      var m = /^glyph([1-9][0-9]*)$/.exec(elementsWithGlyphIds[j].getAttribute("id"));
       if (m) {
         glyphMapping.push({id:m[1], doc:documents[i]});
       }
