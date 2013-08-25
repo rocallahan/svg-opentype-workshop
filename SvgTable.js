@@ -71,7 +71,7 @@ SvgTable.prototype.toArrayBuffer = function () {
   return buf;
 };
 
-SvgTable.fromDocuments = function (documents) {
+SvgTable.fromDocuments = function (documents, options) {
   if (documents.length == 0) {
     throw "Must have at least one document";
   }
@@ -88,7 +88,7 @@ SvgTable.fromDocuments = function (documents) {
     var elementsWithGlyphIds = doc.querySelectorAll("[id]");
     var glyphIds = [];
     for (var j = 0; j < elementsWithGlyphIds.length; ++j) {
-      var m = /^glyph([0-9]+)$/.exec(elementsWithGlyphIds[j].getAttribute("id"));
+      var m = /^glyph([1-9][0-9]*)$/.exec(elementsWithGlyphIds[j].getAttribute("id"));
       if (m) {
         glyphMapping.push({id:m[1], doc:documents[i]});
       }
@@ -107,6 +107,10 @@ SvgTable.fromDocuments = function (documents) {
   var startOfRun = 0;
   for (var j = 0; j < glyphMapping.length; ++j) {
     if (j > 0 && glyphMapping[j].id == glyphMapping[j - 1].id) {
+      if (options && options.ignoreDuplicateGlyphIds) {
+        glyphMapping.splice(j, 1);
+        continue;
+      }
       throw "Duplicate glyphs found for glyph ID " + glyphMapping[j].id;
     }
     if (j == glyphMapping.length - 1 ||
