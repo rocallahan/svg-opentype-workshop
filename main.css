@@ -14,7 +14,7 @@
   border:2px solid black;
   display:block;
 }
-#svgText {
+.svgDoc {
   font-family:monospace;
   height:200px;
   overflow:auto;
