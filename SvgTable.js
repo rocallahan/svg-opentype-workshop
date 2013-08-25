@@ -23,10 +23,12 @@ SvgTable.prototype.toArrayBuffer = function () {
   if (numDocuments > 0xFFFF) {
     throw "Too many documents";
   }
-  var docOffset = 12 + 12*numDocuments;
+  var docIndexOffset = 10;
+  var docOffset = 2 + 12*numDocuments;
   var encodedTexts = [];
   var encoder = new TextEncoder();
   var docOffsets = [];
+  var docLengths = [];
   for (var i = 0; i < numDocuments; ++i) {
     for (var j = 0; j < i; ++j) {
       if (this.documents[j].text == this.documents[i].text) {
@@ -36,19 +38,20 @@ SvgTable.prototype.toArrayBuffer = function () {
     if (j < i) {
       // Reuse existing document text
       docOffsets.push(docOffsets[j]);
+      docLengths.push(docLengths[j]);
       encodedTexts.push(null);
     } else {
       docOffsets.push(docOffset);
       encodedTexts.push(encoder.encode(this.documents[i].text));
       docOffset += encodedTexts[i].byteLength;
+      docLengths.push(encodedTexts[i].byteLength);
     }
   }
   if (length > 0xFFFFFFFF) {
     throw "Table size overflow";
   }
-  var buf = new ArrayBuffer(docOffset);
+  var buf = new ArrayBuffer(docIndexOffset + docOffset);
   var headerView = new DataView(buf);
-  var docIndexOffset = 10;
   headerView.setUint16(0, 0);
   headerView.setUint32(2, docIndexOffset);
   headerView.setUint32(6, 0);
@@ -58,10 +61,10 @@ SvgTable.prototype.toArrayBuffer = function () {
     headerView.setUint16(offset, this.documents[i].startGlyphId);
     headerView.setUint16(offset + 2, this.documents[i].endGlyphId);
     headerView.setUint32(offset + 4, docOffsets[i]);
-    var textLength = encodedTexts[i].byteLength;
+    var textLength = docLengths[i];
     headerView.setUint32(offset + 8, textLength);
     if (encodedTexts[i]) {
-      (new Uint8Array(buf, docOffsets[i], textLength)).set(encodedTexts[i]);
+      (new Uint8Array(buf, docIndexOffset + docOffsets[i], textLength)).set(encodedTexts[i]);
     }
     offset += 12;
   }
@@ -159,7 +162,7 @@ SvgTable.fromTable = function (dataView) {
       throw "Document end out of range";
     }
     var docText = textDecoder.decode(
-      new DataView(dataView.buffer, dataView.byteOffset + docOffset, docLength));
+      new DataView(dataView.buffer, dataView.byteOffset + docIndexOffset + docOffset, docLength));
     table.documents.push({
       startGlyphId:startGlyphId,
       endGlyphId:endGlyphId,
