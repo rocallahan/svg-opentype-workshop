@@ -15,7 +15,9 @@
 <body>
 <p>Load file: <input id="inputFile" type="file">
 <p>SVG document: <button id="createTemplateButton">Create template</button>
-  <textarea spellcheck="false" id="svgText" class="editable"></textarea>
+<button id="addDocumentButton">Add document</button>
+<p><label><input id="ignoreDuplicateGlyphsCheckbox" type="checkbox">Ignore duplicate glyph IDs</label>
+<div id="docContainer"></div>
 <p id="svgTextError">
 <p>Sample text:
   <div id="sample" class="editable" contenteditable></div>

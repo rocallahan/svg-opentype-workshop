@@ -10,7 +10,7 @@ var currentTables;
 var blobURL;
 
 // Update the current font to include an "SVG " table with the contents of the
-// svgText element, reporting errors if necessary.
+// SVG documents, reporting errors if necessary.
 function updateFont() {
   svgTextError.classList.remove("error");
   inlineStyle.textContent = "";
@@ -27,7 +27,12 @@ function updateFont() {
 
   var svgTable;
   try {
-    svgTable = SvgTable.fromDocuments([svgText.value]);
+    var docs = [];
+    for (var c = docContainer.firstChild; c; c = c.nextSibling) {
+      docs.push(c.value);
+    }
+    var options = {ignoreDuplicateGlyphIds:ignoreDuplicateGlyphsCheckbox.checked};
+    svgTable = SvgTable.fromDocuments(docs, options);
   } catch (ex) {
     svgTextError.classList.add("error");
     svgTextError.textContent = "Invalid SVG: " + ex;
@@ -45,7 +50,7 @@ function updateFont() {
 // Set up the current font by reading the contents of the currently selected file 
 function readFile() {
   currentTables = null;
-  svgText.value = "";
+  docContainer.textContent = "";
 
   var files = inputFile.files;
   if (files.length == 0) {
@@ -63,7 +68,11 @@ function readFile() {
         alert("Malformed SVG table: " + ex);
       }
       if (svgTable) {
-        svgText.value = svgTable.getDocumentText(0);
+        for (var i = 0; i < svgTable.getDocumentCount(); ++i) {
+          addDocument(svgTable.getDocumentText(i));
+        }
+      } else {
+        addDocument("");
       }
     }
     updateFont();
@@ -72,19 +81,32 @@ function readFile() {
   });
 }
 
-// Fill in svgText with a useful initial template
+// Fill in first SVG document with a useful initial template
 function createTemplate() {
-  svgText.value +=
-    "<svg xmlns='http://www.w3.org/2000/svg'>\n" +
-    "<rect id='glyph37' x='0' y='-500' width='500' height='500' fill='lime'/>\n" +
-    "</svg>\n";
+  if (docContainer.firstChild) {
+    docContainer.firstChild.value =
+      "<svg xmlns='http://www.w3.org/2000/svg'>\n" +
+      "<rect id='glyph37' x='0' y='-500' width='500' height='500' fill='lime'/>\n" +
+      "</svg>";
+  }
+  updateFont();
+}
+
+function addDocument(value) {
+  var textArea = document.createElement("textarea");
+  textArea.setAttribute("spellcheck", "false");
+  textArea.setAttribute("class", "editable svgDoc");
+  textArea.value = value;
+  docContainer.appendChild(textArea);
   updateFont();
 }
 
 function init() {
   inputFile.addEventListener("change", readFile);
-  svgText.addEventListener("input", updateFont);
+  docContainer.addEventListener("input", updateFont);
   createTemplateButton.addEventListener("click", createTemplate);
+  addDocumentButton.addEventListener("click", function() { addDocument(""); });
+  ignoreDuplicateGlyphsCheckbox.addEventListener("change", updateFont);
 
   var sampleText = [];
   for (var i = 32; i <= 127; ++i) {
